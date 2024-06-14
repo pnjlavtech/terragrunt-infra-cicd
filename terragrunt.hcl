@@ -16,7 +16,7 @@ locals {
 
   # Extract the variables we need for easy access
   account_name = local.account_vars.locals.account_name
-  account_id   = local.account_vars.locals.aws_account_id
+  // account_id   = local.account_vars.locals.aws_account_id
   aws_region   = local.region_vars.locals.aws_region
 }
 
@@ -29,7 +29,7 @@ provider "aws" {
   region = "${local.aws_region}"
 
   # Only these AWS Account IDs may be operated on by this template
-  allowed_account_ids = ["${local.account_id}"]
+  allowed_account_ids = ["${get_env("AWS_ACCOUNT_ID", "")}"]
 }
 EOF
 }
@@ -40,7 +40,7 @@ remote_state {
   backend = "s3"
   config = {
     encrypt        = true
-    bucket         = "${get_env("TG_BUCKET_PREFIX", "")}-terragrunt-tf-state-${local.account_name}-${local.aws_region}"
+    bucket         = "${get_env("AWS_ACCOUNT_ID", "")}-terragrunt-tf-state-${local.account_name}-${local.aws_region}"
     key            = "${path_relative_to_include()}/tf.tfstate"
     region         = local.aws_region
     dynamodb_table = "tf-locks"
@@ -52,57 +52,57 @@ remote_state {
 }
 
 # Configure what repos to search when you run 'terragrunt catalog'
-catalog {
-  urls = [
-    "https://github.com/pnjlavtech/terragrunt-infrastructure-modules",
-    "https://github.com/gruntwork-io/terraform-aws-utilities",
-    "https://github.com/gruntwork-io/terraform-kubernetes-namespace",
-    "terraform-aws-modules/vpc/aws",
-    "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  ]
-}
+// catalog {
+//   urls = [
+//     "https://github.com/pnjlavtech/terragrunt-infrastructure-modules",
+//     "https://github.com/gruntwork-io/terraform-aws-utilities",
+//     "https://github.com/gruntwork-io/terraform-kubernetes-namespace",
+//     "terraform-aws-modules/vpc/aws",
+//     "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+//   ]
+// }
 
 
-terraform {
-  before_hook "before_hook" {
-    commands     = ["apply", "plan"]
-    execute      = ["echo", "Running Terraform"]
-  }
+// terraform {
+//   before_hook "before_hook" {
+//     commands     = ["apply", "plan"]
+//     execute      = ["echo", "Running Terraform"]
+//   }
 
-  before_hook "checkov" {
-    commands = ["plan"]
-    execute = [
-      "checkov",
-      "-d",
-      ".",
-      "--quiet",
-      "--framework",
-      "terraform",
-    ]
-  }
+//   before_hook "checkov" {
+//     commands = ["plan"]
+//     execute = [
+//       "checkov",
+//       "-d",
+//       ".",
+//       "--quiet",
+//       "--framework",
+//       "terraform",
+//     ]
+//   }
 
-  // The file path is resolved relative to the module directory when --chdir or --recursive is used. 
-  // To use a config file from the working directory when recursing, pass an absolute path:
-  after_hook "validate_tflint" {
-    commands = ["validate"]
-    execute = [
-      "sh", "-c", <<EOT
-        echo "Run tflint for project '${path_relative_to_include()}'..."
-        export TFLINT_LOG=debug tflint
-        (tflint --config=/usr2/home/jay/src/terragrunt-infrastructure-live/.tflint.hcl -f json )
-        error_code=$?
-        echo "\n Run tflint for project '${path_relative_to_include()}'...DONE\n"
-        exit $error_code
-      EOT
-    ]
-  }
+//   // The file path is resolved relative to the module directory when --chdir or --recursive is used. 
+//   // To use a config file from the working directory when recursing, pass an absolute path:
+//   after_hook "validate_tflint" {
+//     commands = ["validate"]
+//     execute = [
+//       "sh", "-c", <<EOT
+//         echo "Run tflint for project '${path_relative_to_include()}'..."
+//         export TFLINT_LOG=debug tflint
+//         (tflint --config=/usr2/home/jay/src/terragrunt-infrastructure-live/.tflint.hcl -f json )
+//         error_code=$?
+//         echo "\n Run tflint for project '${path_relative_to_include()}'...DONE\n"
+//         exit $error_code
+//       EOT
+//     ]
+//   }
 
-  after_hook "after_hook" {
-    commands     = ["apply", "plan"]
-    execute      = ["echo", "Finished running Terraform"]
-    run_on_error = true
-  }
-}
+//   after_hook "after_hook" {
+//     commands     = ["apply", "plan"]
+//     execute      = ["echo", "Finished running Terraform"]
+//     run_on_error = true
+//   }
+// }
 
 
 
