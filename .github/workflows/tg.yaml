@@ -15,7 +15,7 @@ env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  IS_GH: “TRUE”
+  # IS_GH: “TRUE”
 
 
 jobs:
@@ -51,9 +51,9 @@ jobs:
       - name: Plan
         uses: gruntwork-io/terragrunt-action@v2
         env:
+          AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
           TF_PLUGIN_CACHE_DIR: /github/workspace/.terraform.d/plugin-cache
         with:
-          AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
           tf_version: ${{ env.tf_version }}
           tg_version: ${{ env.tg_version }}
           tg_dir: ${{ env.working_dir }}
