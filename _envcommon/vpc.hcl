@@ -18,12 +18,13 @@ locals {
   eks_name   = local.environment_vars.locals.eks_name
   env        = local.environment_vars.locals.environment
   env-region = "${local.env}-${local.aws_region}"
+  // gh_token   = get_env("GH_PAT")
   vpc_cidr   = local.cidr
-
 
   # Expose the base source URL so different versions of the module can be deployed in different environments. 
   # This will be used to construct the source URL in the child terragrunt configurations.
-  base_source_url = "https://jazzlyj:${get_env("GH_PAT", "")}@github.com/pnjlavtech/terragrunt-infrastructure-modules.git//modules/vpc"
+  base_source_url = "git::https://github.com/pnjlavtech/terragrunt-infrastructure-modules.git//modules/vpc"
+  // base_source_url = "git::https://jazzlyj:${gh_token}@github.com/pnjlavtech/terragrunt-infrastructure-modules.git//modules/vpc"
 
   //  Set cidr_subnet newbits and netnums values to be common across all environments
   public_subnets = [
