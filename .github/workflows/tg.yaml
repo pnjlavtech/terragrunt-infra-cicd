@@ -7,14 +7,14 @@ on:
 
 
 env:
-  tf_version: '1.5.7'
-  tg_version: '0.53.2'
-  working_dir: './non-prod/us-west-2/qa/vpc'
-  TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
-  # WORKING_DIRECTORY: ‘./non-prod/us-west-2/qa/vpc’
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  GH_PAT: ${{ secrets.GH_PAT }}
+  tg_version: '0.53.2'
+  tf_version: '1.5.7'
+  TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
+  working_dir: './non-prod/us-west-2/qa/vpc'
   # IS_GH: “TRUE”
 
 
@@ -53,11 +53,19 @@ jobs:
         env:
           AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
           TF_PLUGIN_CACHE_DIR: /github/workspace/.terraform.d/plugin-cache
+          # configure git to use custom token to clone repository.
+          INPUT_PRE_EXEC_1: |
+            git config --global url."https://jazzlyj:${{secrets.GH_PAT}}@github.com".insteadOf "https://github.com"
+          # print git configuration
+          INPUT_PRE_EXEC_2: |
+            git config --global --list
         with:
           tf_version: ${{ env.tf_version }}
           tg_version: ${{ env.tg_version }}
           tg_dir: ${{ env.working_dir }}
           tg_command: plan
+
+
 
   # deploy:
   #   runs-on: ubuntu-latest
