@@ -23,7 +23,8 @@ locals {
 
   # Expose the base source URL so different versions of the module can be deployed in different environments. 
   # This will be used to construct the source URL in the child terragrunt configurations.
-  base_source_url = "git::git@github.com:pnjlavtech/terragrunt-infrastructure-modules.git//modules/vpc"
+  base_source_url = "https://github.com/pnjlavtech/terragrunt-infrastructure-modules.git//modules/vpc"
+
 
   //  Set cidr_subnet newbits and netnums values to be common across all environments
   public_subnets = [
