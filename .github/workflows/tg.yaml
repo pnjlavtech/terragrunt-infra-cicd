@@ -1,6 +1,10 @@
 name: 'Terragrunt GitHub Actions'
 on:
-  - pull_request
+  push:
+    branches:
+      - "main"
+
+
 
 env:
   tf_version: '1.5.7'
