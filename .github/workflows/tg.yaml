@@ -63,6 +63,14 @@ jobs:
         # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
         GITHUB_TOKEN: ${{ env.GH_PAT }}
 
+    - name: Run TFLint
+      run: tflint -f compact
+      # env:
+      #   # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+      #   GITHUB_TOKEN: ${{ env.GH_PAT }}
+
+
+
   plan:
     runs-on: ubuntu-latest
     steps:
