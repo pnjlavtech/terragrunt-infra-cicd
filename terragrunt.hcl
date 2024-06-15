@@ -36,7 +36,6 @@ EOF
 }
 
 # Configure Terragrunt to automatically store tfstate files in an S3 bucket
-# Remember to set the OS env var value of TG_BUCKET_PREFIX
 remote_state {
   backend = "s3"
   config = {
@@ -82,21 +81,8 @@ remote_state {
 //     ]
 //   }
 
-//   // The file path is resolved relative to the module directory when --chdir or --recursive is used. 
-//   // To use a config file from the working directory when recursing, pass an absolute path:
+// This is now taken care of in the ghactions workflow
 //   after_hook "validate_tflint" {
-//     commands = ["validate"]
-//     execute = [
-//       "sh", "-c", <<EOT
-//         echo "Run tflint for project '${path_relative_to_include()}'..."
-//         export TFLINT_LOG=debug tflint
-//         (tflint --config=/usr2/home/jay/src/terragrunt-infrastructure-live/.tflint.hcl -f json )
-//         error_code=$?
-//         echo "\n Run tflint for project '${path_relative_to_include()}'...DONE\n"
-//         exit $error_code
-//       EOT
-//     ]
-//   }
 
 //   after_hook "after_hook" {
 //     commands     = ["apply", "plan"]
