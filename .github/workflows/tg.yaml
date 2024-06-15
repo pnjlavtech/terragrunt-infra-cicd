@@ -33,14 +33,44 @@ jobs:
   #         tg_dir: ${{ env.working_dir }}
   #         tg_command: 'hclfmt --terragrunt-check --terragrunt-diff'
 
+  tflint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Create Terraform Plugin Cache Dir
+      run: mkdir -p $TF_PLUGIN_CACHE_DIR
+
+    - name: Terraform Plugin Cache
+      uses: actions/cache@v4.0.1
+      with:
+        path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+        key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
+
+    - name: Setup TFLint
+      uses: terraform-linters/setup-tflint@v4
+      with:
+        tflint_version: v0.50.3
+        # github_token: ${{ secrets.MY_CUSTOM_GITHUB_TOKEN }}
+
+    - name: Show version
+      run: tflint --version
+
+    - name: Init TFLint
+      run: tflint --init
+      env:
+        # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+        GITHUB_TOKEN: ${{ env.GH_PAT }}
+
   plan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@main
 
-      - name: Create Terraform Plugin Cache Dir
-        run: mkdir -p $TF_PLUGIN_CACHE_DIR
+      # - name: Create Terraform Plugin Cache Dir
+      #   run: mkdir -p $TF_PLUGIN_CACHE_DIR
 
       - name: Terraform Plugin Cache
         uses: actions/cache@v4.0.1
