@@ -15,7 +15,7 @@ env:
   tf_version: '1.5.7'
   TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
   working_dir: './non-prod/us-west-2/qa/vpc'
-  # IS_GH: “TRUE”
+  # IS_GH: “TRUE”  # needed if there are private repos being used
 
 
 jobs:
@@ -36,6 +36,7 @@ jobs:
   tflint:
     runs-on: ubuntu-latest
     steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so follow-up steps can access it
     - name: Checkout source code
       uses: actions/checkout@v4
 
@@ -74,9 +75,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@main
 
-      # - name: Create Terraform Plugin Cache Dir
-      #   run: mkdir -p $TF_PLUGIN_CACHE_DIR
-
       - name: Terraform Plugin Cache
         uses: actions/cache@v4.0.1
         with:
@@ -88,12 +86,9 @@ jobs:
         env:
           AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
           TF_PLUGIN_CACHE_DIR: /github/workspace/.terraform.d/plugin-cache
-          # configure git to use custom token to clone repository.
+          # configure git to use custom token to clone repository if it is a private repo.
           # INPUT_PRE_EXEC_1: |
           #   git config --global url."https://jazzlyj:${{secrets.GH_PAT}}@github.com".insteadOf "https://github.com"
-          # # print git configuration
-          # INPUT_PRE_EXEC_2: |
-          #   git config --global --list
         with:
           tf_version: ${{ env.tf_version }}
           tg_version: ${{ env.tg_version }}
@@ -108,14 +103,12 @@ jobs:
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
       
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
     needs: [ plan ]
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so follow-up steps can access it
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Checkov GitHub Action
         uses: bridgecrewio/checkov-action@v12

@@ -16,8 +16,6 @@ locals {
 
   # Extract the variables we need for easy access
   account_name = local.account_vars.locals.account_name
-  // account_id   = get_env("AWS_ACCOUNT_ID")
-  // account_id   = local.account_vars.locals.aws_account_id
   aws_region   = local.region_vars.locals.aws_region
 }
 
@@ -51,44 +49,11 @@ remote_state {
   }
 }
 
-# Configure what repos to search when you run 'terragrunt catalog'
-// catalog {
-//   urls = [
-//     "https://github.com/pnjlavtech/terragrunt-infrastructure-modules",
-//     "https://github.com/gruntwork-io/terraform-aws-utilities",
-//     "https://github.com/gruntwork-io/terraform-kubernetes-namespace",
-//     "terraform-aws-modules/vpc/aws",
-//     "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-//   ]
-// }
 
-
+// The linting and SCA checks by tflint and checkov are done in the ghactions workflow and are not needed here
 // terraform {
-//   before_hook "before_hook" {
-//     commands     = ["apply", "plan"]
-//     execute      = ["echo", "Running Terraform"]
-//   }
-
 //   before_hook "checkov" {
-//     commands = ["plan"]
-//     execute = [
-//       "checkov",
-//       "-d",
-//       ".",
-//       "--quiet",
-//       "--framework",
-//       "terraform",
-//     ]
-//   }
-
-// This is now taken care of in the ghactions workflow
 //   after_hook "validate_tflint" {
-
-//   after_hook "after_hook" {
-//     commands     = ["apply", "plan"]
-//     execute      = ["echo", "Finished running Terraform"]
-//     run_on_error = true
-//   }
 // }
 
 
