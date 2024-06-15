@@ -1,5 +1,8 @@
 name: 'Terragrunt Destroy'
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - "destroy"
 
 permissions: read-all
 
