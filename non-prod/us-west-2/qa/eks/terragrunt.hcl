@@ -45,6 +45,6 @@ dependency "vpc" {
 # We don't need to override any of the common parameters for this environment, so we don't specify any inputs.
 # ---------------------------------------------------------------------------------------------------------------------
 inputs = {
-  vpc_id         = dependency.vpc.outputs.vpc_id
-  subnet_ids     = dependency.vpc.outputs.private_subnets
+  vpc_id          = dependency.vpc.outputs.vpc_id
+  private_subnets = dependency.vpc.outputs.private_subnets
 }
