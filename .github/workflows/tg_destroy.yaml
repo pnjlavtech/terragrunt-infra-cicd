@@ -4,23 +4,19 @@ on:
     branches:
       - "destroy"
 
-permissions: read-all
 
 env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  GH_PAT: ${{ secrets.GH_PAT }}
   tg_version: '0.53.2'
   tf_version: '1.5.7'
-  TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
-  working_dir: './non-prod/us-west-2/qa/vpc'
+  working_dir: './non-prod/us-west-2/qa'
 
 jobs:
   destroy:
     runs-on: ubuntu-latest
     environment: 'non-prod'
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: 'Checkout'
         uses: actions/checkout@main
