@@ -14,7 +14,7 @@ env:
   tg_version: '0.53.2'
   tf_version: '1.5.7'
   TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
-  working_dir: './non-prod/us-west-2/qa'
+  working_dir: './non-prod/us-west-2'
   # IS_GH: “TRUE”  # needed if there are private repos being used
 
 
@@ -93,7 +93,7 @@ jobs:
           tf_version: ${{ env.tf_version }}
           tg_version: ${{ env.tg_version }}
           tg_dir: ${{ env.working_dir }}
-          tg_command: plan
+          tg_command: 'run-all plan'
 
 
 
@@ -154,6 +154,6 @@ jobs:
           tf_version: ${{ env.tf_version }}
           tg_version: ${{ env.tg_version }}
           tg_dir: ${{ env.working_dir }}
-          tg_command: 'apply'
+          tg_command: 'run-all apply'
 
 
