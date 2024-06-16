@@ -26,20 +26,20 @@ terraform {
 
 dependency "vpc" {
   config_path = "../vpc"
-  skip_outputs = true 
-}
-  // mock_outputs = {
-  //   vpc_id          = "vpc-0d92a29a969c4f59d"
-  //   private_subnets = [
-  //    "subnet-027fab9b2cb81747e",
-  //    "subnet-0270b810f825b7a7c",
-  //    "subnet-0832b43895780e4f6",
-  //   ]
-
-  // }
+//   skip_outputs = true 
+// }
+  mock_outputs = {
+    vpc_id          = "vpc-0d92a29a969c4f59d"
+    private_subnets = [
+     "subnet-027fab9b2cb81747e",
+     "subnet-0270b810f825b7a7c",
+     "subnet-0832b43895780e4f6",
+    ]
+  }
+  mock_outputs_allowed_terraform_commands = ["plan"]
 
   // mock_outputs_merge_strategy_with_state = "shallow"
-// }
+}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # We don't need to override any of the common parameters for this environment, so we don't specify any inputs.
