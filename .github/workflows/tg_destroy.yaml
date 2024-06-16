@@ -4,6 +4,8 @@ on:
     branches:
       - "destroy"
 
+permissions: read-all
+
 
 env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -11,7 +13,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   tg_version: '0.53.2'
   tf_version: '1.5.7'
-  working_dir: './non-prod/us-west-2/qa'
+  working_dir: './non-prod/us-west-2'
 
 jobs:
   destroy:
