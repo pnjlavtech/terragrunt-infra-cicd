@@ -12,7 +12,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   tg_version: '0.53.2'
   tf_version: '1.5.7'
-  working_dir: './non-prod/us-west-2/qa/eks'
+  working_dir: './non-prod/us-west-2/qa/vpc'
 
 jobs:
   destroy:
