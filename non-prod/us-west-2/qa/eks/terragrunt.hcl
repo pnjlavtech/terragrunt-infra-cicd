@@ -24,24 +24,24 @@ terraform {
   source = "${include.envcommon.locals.base_source_url}?ref=v0.2.1--eks-iam"
 }
 
-// dependency "vpc" {
-//   config_path = "../vpc"
-//   skip_outputs = true
-//   // mock_outputs = {
-//   //   vpc_id          = "vpc-0d92a29a969c4f59d"
-//   //   private_subnets = [
-//   //    "subnet-027fab9b2cb81747e",
-//   //    "subnet-0270b810f825b7a7c",
-//   //    "subnet-0832b43895780e4f6",
-//   //   ]
-//   // }
-//   // mock_outputs_allowed_terraform_commands = ["plan"]
-// }
+dependency "vpc" {
+  config_path = "../vpc"
+  // skip_outputs = true
+  mock_outputs = {
+    vpc_id          = "	vpc-08f7169617628dd22"
+    private_subnets = [
+             "subnet-0037719e19ca630b5", 
+             "subnet-0c40e9b3d7602d3aa", 
+             "subnet-07c154f3a5adccd00" 
+    ]
+  }
+  // mock_outputs_allowed_terraform_commands = ["plan"]
+}
 
-// # ---------------------------------------------------------------------------------------------------------------------
-// # We don't need to override any of the common parameters for this environment, so we don't specify any inputs.
-// # ---------------------------------------------------------------------------------------------------------------------
-// inputs = {
-//   vpc_id          = dependency.vpc.outputs.vpc_id
-//   private_subnets = dependency.vpc.outputs.private_subnets
-// }
+# ---------------------------------------------------------------------------------------------------------------------
+# We don't need to override any of the common parameters for this environment, so we don't specify any inputs.
+# ---------------------------------------------------------------------------------------------------------------------
+inputs = {
+  vpc_id          = dependency.vpc.outputs.vpc_id
+  private_subnets = dependency.vpc.outputs.private_subnets
+}
