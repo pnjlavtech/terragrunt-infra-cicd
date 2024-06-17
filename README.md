@@ -1,6 +1,7 @@
-# Infrastructure-CICD for Terragrunt
+# Infrastructure-CICD for Terragrunt using Github Actions Deployted into AWS 
 
-This repo, along with the [terragrunt-infrastructure-modules](https://github.com/pnjlavtech/terragrunt-infrastructure-modules), show an example file/folder structure you can use with [Terragrunt](https://github.com/gruntwork-io/terragrunt) to keep your
+This repo, along with the [terragrunt-infrastructure-modules](https://github.com/pnjlavtech/terragrunt-infrastructure-modules), 
+show an example file/folder structure you can use with [Terragrunt](https://github.com/gruntwork-io/terragrunt) to keep your
 [Terraform](https://www.terraform.io) code DRY. For background information, 
 check out the [Keep your code DRY](https://github.com/gruntwork-io/terragrunt#keep-your-terraform-code-dry) 
 section of the Terragrunt documentation.
@@ -16,8 +17,22 @@ Be sure to read through [the Terragrunt documentation on DRY
 Architectures](https://terragrunt.gruntwork.io/docs/features/keep-your-terragrunt-architecture-dry/) to understand the
 features of Terragrunt used in this folder organization.
 
-Note: This code is solely for demonstration purposes. This is not production-ready code, so use at your own risk. If
-you are interested in battle-tested, production-ready Terraform code, check out [Gruntwork](http://www.gruntwork.io/).
+The GH Actions pipeline also makes use of tflint for linting and Checkov for SCA (policy as code)
+## Tflint
+[tflint action](https://github.com/marketplace/actions/setup-tflint)
+
+## Checkov
+Checkov scans cloud infrastructure configurations to find misconfigurations before they're deployed.
+
+Checkov is a static code analysis tool for infrastructure as code (IaC) and also a software composition analysis (SCA) tool for images and open source packages.
+
+It scans cloud infrastructure provisioned using Terraform, Terraform plan, Cloudformation, AWS SAM, Kubernetes, Helm charts, Kustomize, Dockerfile, Serverless, Bicep, OpenAPI or ARM Templates and detects security and compliance misconfigurations using graph-based scanning.
+
+It performs Software Composition Analysis (SCA) scanning which is a scan of open source packages and images for Common Vulnerabilities and Exposures (CVEs).
+
+[checkov action](https://github.com/marketplace/actions/checkov-github-action)
+
+
 
 
 
@@ -34,27 +49,20 @@ you are interested in battle-tested, production-ready Terraform code, check out 
    state, and S3 bucket names must be globally unique. The name currently in
    the file is already taken, so you'll have to specify your own. Alternatives, you can
    set the environment variable `TG_BUCKET_PREFIX` to set a custom prefix.
-3. Update the `account_name` and `aws_account_id` parameters in [`non-prod/account.hcl`](/non-prod/account.hcl) and
-   [`prod/account.hcl`](/prod/account.hcl) with the names and IDs of accounts you want to use for non production and 
+3. Update the `account_name` parameters in [`non-prod/account.hcl`](/non-prod/account.hcl) and
+   [`prod/account.hcl`](/prod/account.hcl) with the names of accounts you want to use for non production and 
    production workloads, respectively.
-4. Configure your AWS credentials using one of the supported [authentication
+4. Create several variables in including theAWS credentials using one of the supported [authentication
    mechanisms](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
 
 
 
 ### Deploying a single module
-
-1. `cd` into the module's folder (e.g. `cd non-prod/us-west-2/qa/vpc`).
-1. Run `terragrunt plan` to see the changes you're about to apply.
-1. If the plan looks good, run `terragrunt apply`.
+1. In the tg_yaml env: section set "working_dir" to the module and location to be deployed (e.g. `cd non-prod/us-west-2/qa/vpc`).
 
 
 ### Deploying all modules in a region
-
-1. `cd` into the region folder (e.g. `cd non-prod/us-west-2`).
-1. Configure the password for the MySQL DB as an environment variable: `export TF_VAR_master_password=(...)`.
-1. Run `terragrunt run-all plan` to see all the changes you're about to apply.
-1. If the plan looks good, run `terragrunt run-all apply`.
+1. In the tg_yaml env: section set "working_dir" to the location to be deployed (e.g. `cd non-prod/us-west-2`).
 
 
 ### Testing the infrastructure after it's deployed
