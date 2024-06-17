@@ -4,6 +4,7 @@ on:
     branches:
       - "destroy"
 
+
 permissions: read-all
 
 env:
