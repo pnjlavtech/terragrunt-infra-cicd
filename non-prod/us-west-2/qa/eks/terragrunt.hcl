@@ -21,13 +21,11 @@ include "envcommon" {
 # Configure the version of the module to use in this environment. This allows you to promote new versions one
 # environment at a time (e.g., qa -> stage -> prod).
 terraform {
-  source = "${include.envcommon.locals.base_source_url}?ref=v0.1.4--eks-iam"
+  source = "${include.envcommon.locals.base_source_url}?ref=v0.1.5--eks-iam"
 }
 
 dependency "vpc" {
   config_path = "../vpc"
-//   skip_outputs = true 
-// }
   mock_outputs = {
     vpc_id          = "vpc-0d92a29a969c4f59d"
     private_subnets = [
@@ -37,8 +35,6 @@ dependency "vpc" {
     ]
   }
   mock_outputs_allowed_terraform_commands = ["plan"]
-
-  // mock_outputs_merge_strategy_with_state = "shallow"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
