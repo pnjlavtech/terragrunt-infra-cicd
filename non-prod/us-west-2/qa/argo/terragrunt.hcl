@@ -26,6 +26,7 @@ terraform {
 
 dependency "eks" {
   config_path = "../eks"
+  skip_outputs = true
   // mock_outputs = {
   //   vpc_id          = "vpc-0d92a29a969c4f59d"
   // }
