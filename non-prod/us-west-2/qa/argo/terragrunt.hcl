@@ -21,10 +21,10 @@ include "envcommon" {
 # Configure the version of the module to use in this environment. This allows you to promote new versions one
 # environment at a time (e.g., qa -> stage -> prod).
 terraform {
-  source = "${include.envcommon.locals.base_source_url}?ref=v0.1.0--argo"
+  source = "${include.envcommon.locals.base_source_url}?ref=v0.1.1--argo"
 }
 
-dependency "vpc" {
+dependency "eks" {
   config_path = "../eks"
   // mock_outputs = {
   //   vpc_id          = "vpc-0d92a29a969c4f59d"
@@ -36,7 +36,9 @@ dependency "vpc" {
 # ---------------------------------------------------------------------------------------------------------------------
 # We don't need to override any of the common parameters for this environment, so we don't specify any inputs.
 # ---------------------------------------------------------------------------------------------------------------------
-// inputs = {
-//   vpc_id          = dependency.vpc.outputs.vpc_id
-//   private_subnets = dependency.vpc.outputs.private_subnets
-// }
+inputs = {
+  cluster_ca_certificate = base64decode(dependency.eks.cluster_certificate_authority_data)
+  cluster_endpoint       = dependency.eks.cluster_endpoint
+  cluster_name           = dependency.eks.cluster_name
+}
+
