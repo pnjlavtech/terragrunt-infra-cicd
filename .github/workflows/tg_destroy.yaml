@@ -6,7 +6,6 @@ on:
 
 permissions: read-all
 
-
 env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
