@@ -21,7 +21,7 @@ include "envcommon" {
 # Configure the version of the module to use in this environment. This allows you to promote new versions one
 # environment at a time (e.g., qa -> stage -> prod).
 terraform {
-  source = "${include.envcommon.locals.base_source_url}?ref=v0.1.1--argo"
+  source = "${include.envcommon.locals.base_source_url}?ref=v0.1.3--argocd"
 }
 
 dependency "eks" {
@@ -38,7 +38,7 @@ dependency "eks" {
 # We don't need to override any of the common parameters for this environment, so we don't specify any inputs.
 # ---------------------------------------------------------------------------------------------------------------------
 inputs = {
-  cluster_certificate_authority_data = base64decode(dependency.eks.outputs.cluster_certificate_authority_data)
+  cluster_certificate_authority_data = dependency.eks.outputs.cluster_certificate_authority_data
   cluster_endpoint                   = dependency.eks.outputs.cluster_endpoint
   cluster_name                       = dependency.eks.outputs.cluster_name
 }
