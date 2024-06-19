@@ -39,8 +39,8 @@ dependency "eks" {
 # We don't need to override any of the common parameters for this environment, so we don't specify any inputs.
 # ---------------------------------------------------------------------------------------------------------------------
 inputs = {
-  cluster_certificate_authority_data = base64decode(dependency.eks.cluster_certificate_authority_data)
-  cluster_endpoint                   = dependency.eks.cluster_endpoint
-  cluster_name                       = dependency.eks.cluster_name
+  cluster_certificate_authority_data = base64decode(dependency.eks.outputs.cluster_certificate_authority_data)
+  cluster_endpoint                   = dependency.eks.outputs.cluster_endpoint
+  cluster_name                       = dependency.eks.outputs.cluster_name
 }
 
