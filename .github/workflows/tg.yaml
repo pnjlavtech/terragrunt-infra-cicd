@@ -64,8 +64,7 @@ jobs:
         GITHUB_TOKEN: ${{ env.GH_PAT }}
 
     - name: Run TFLint
-      run: tflint -f json
- 
+      run: tflint -f json 
 
 
   plan:
@@ -94,7 +93,6 @@ jobs:
           tg_version: ${{ env.tg_version }}
           tg_dir: ${{ env.working_dir }}
           tg_command: 'run-all plan'
-
 
 
   scan:
@@ -173,6 +171,3 @@ jobs:
   #         tg_version: ${{ env.tg_version }}
   #         tg_dir: ${{ env.working_dir }}
   #         tg_command: 'destroy'
-
-
-
