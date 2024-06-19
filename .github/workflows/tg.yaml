@@ -4,7 +4,9 @@ on:
     branches:
       - "main"
 
+
 permissions: read-all
+
 
 env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
