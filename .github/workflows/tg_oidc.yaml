@@ -10,8 +10,8 @@ permissions: read-all
 
 env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GH_PAT: ${{ secrets.GH_PAT }}
   tg_version: '0.53.2'
   tf_version: '1.5.7'
@@ -57,7 +57,7 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      # id-token: write
       contents: read
     needs: [ tflint ]
     steps:
@@ -70,11 +70,11 @@ jobs:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
           key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
-          aws-region: us-west-2
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+      #     aws-region: us-west-2
 
       - name: Plan
         uses: gruntwork-io/terragrunt-action@v2
@@ -91,61 +91,61 @@ jobs:
           tg_command: 'run-all plan'
 
 
-  # scan:
-  #   permissions:
-  #     contents: read # for actions/checkout to fetch code
-  #     security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-  #     actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+  scan:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
       
-  #   runs-on: ubuntu-latest
-  #   needs: [ plan ]
+    runs-on: ubuntu-latest
+    needs: [ plan ]
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Checkov GitHub Action
-  #       uses: bridgecrewio/checkov-action@v12
-  #       with:
-  #         # This will add both a CLI output to the console and create a results.sarif file
-  #         output_format: cli,sarif
-  #         output_file_path: console,results.sarif
+      - name: Checkov GitHub Action
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          # This will add both a CLI output to the console and create a results.sarif file
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
         
-  #     - name: Upload SARIF file
-  #       uses: github/codeql-action/upload-sarif@v3
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
         
-  #       # Results are generated only on a success or failure
-  #       # this is required since GitHub by default won't run the next step
-  #       # when the previous one has failed. Security checks that do not pass will 'fail'.
-  #       # An alternative is to add `continue-on-error: true` to the previous step
-  #       # Or 'soft_fail: true' to checkov.
-  #       if: success() || failure()
-  #       with:
-  #         sarif_file: results.sarif
+        # Results are generated only on a success or failure
+        # this is required since GitHub by default won't run the next step
+        # when the previous one has failed. Security checks that do not pass will 'fail'.
+        # An alternative is to add `continue-on-error: true` to the previous step
+        # Or 'soft_fail: true' to checkov.
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
 
 
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: [ scan ]
-  #   environment: 'non-prod'
-  #   # if: github.ref == 'refs/heads/main'
-  #   steps:
-  #     - name: 'Checkout'
-  #       uses: actions/checkout@main
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ scan ]
+    environment: 'non-prod'
+    # if: github.ref == 'refs/heads/main'
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@main
 
-  #     - name: Terraform Plugin Cache
-  #       uses: actions/cache@v4.0.1
-  #       with:
-  #         path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-  #         key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
+      - name: Terraform Plugin Cache
+        uses: actions/cache@v4.0.1
+        with:
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
 
-  #     - name: Deploy
-  #       uses: gruntwork-io/terragrunt-action@v2
-  #       env:
-  #         AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
-  #         TF_PLUGIN_CACHE_DIR: /github/workspace/.terraform.d/plugin-cache
-  #       with:
-  #         tf_version: ${{ env.tf_version }}
-  #         tg_version: ${{ env.tg_version }}
-  #         tg_dir: ${{ env.working_dir }}
-  #         tg_command: 'run-all apply --terragrunt-log-level debug'
+      - name: Deploy
+        uses: gruntwork-io/terragrunt-action@v2
+        env:
+          AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
+          TF_PLUGIN_CACHE_DIR: /github/workspace/.terraform.d/plugin-cache
+        with:
+          tf_version: ${{ env.tf_version }}
+          tg_version: ${{ env.tg_version }}
+          tg_dir: ${{ env.working_dir }}
+          tg_command: 'run-all apply --terragrunt-log-level debug'
