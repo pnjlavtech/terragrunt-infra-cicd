@@ -24,6 +24,11 @@ terraform {
   source = "${include.envcommon.locals.base_source_url}?ref=v0.1.0--iam-oidc-gh"
 }
 
+dependency "vpc" {
+  config_path  = "../vpc"
+  skip_outputs = true
+}
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # We don't need to override any of the common parameters for this environment, so we don't specify any inputs.
