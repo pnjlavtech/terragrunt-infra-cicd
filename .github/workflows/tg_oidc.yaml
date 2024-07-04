@@ -10,8 +10,10 @@ permissions: read-all
 
 env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: 'us-west-2'
+  AWS_ROLE_TO_ASSUME: 'arn:aws:iam::905418080677:role/github_oidc_role'
+  # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GH_PAT: ${{ secrets.GH_PAT }}
   tg_version: '0.53.2'
   tf_version: '1.5.7'
@@ -57,8 +59,8 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     permissions:
-      # id-token: write
-      contents: read
+      id-token: write # This is required for requesting the JWT 
+      # contents: read # This is required for actions/checkout
     needs: [ tflint ]
     steps:
       - name: Checkout
@@ -70,11 +72,11 @@ jobs:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
           key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
 
-      # - name: Configure AWS Credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
-      #     aws-region: us-west-2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Plan
         uses: gruntwork-io/terragrunt-action@v2
