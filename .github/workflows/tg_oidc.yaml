@@ -15,6 +15,7 @@ env:
   # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GH_PAT: ${{ secrets.GH_PAT }}
+  TG_VER: 0.53.2
   tg_version: '0.53.2'
   tf_version: '1.5.7'
   TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
@@ -86,7 +87,7 @@ jobs:
 
       # Install the latest version of Terragrunt CLI and configure the Terragrunt CLI configuration file with a Terragrunt Cloud user API token
       - name: Setup Terraform 
-        uses: hashicorp/setup-Terraform@v1
+        uses: hashicorp/setup-Terraform@v3
         with:
           terraform_version: ${{ env.tf_version }}
           terraform_wrapper: true
@@ -100,7 +101,7 @@ jobs:
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v3
         with:
-          terragrunt_version: ${{ env.tg_version }}
+          terragrunt_version: ${{ env.TG_VER }}
           token: ${{ env.GH_PAT }}
 
       # Initialize a new or existing Terragrunt working directory by creating initial files, loading any remote state, downloading modules, etc.
