@@ -12,8 +12,8 @@ env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_REGION: 'us-west-2'
   AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GH_PAT: ${{ secrets.GH_PAT }}
   TG_VER: 0.53.2
   tg_version: '0.53.2'
@@ -60,7 +60,7 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     permissions:
-      # id-token: write # This is required for requesting the JWT 
+      id-token: write # This is required for requesting the JWT 
       contents: read # This is required for actions/checkout
     needs: [ tflint ]
 
@@ -78,113 +78,113 @@ jobs:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
           key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
 
-      # - name: Configure AWS Credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
-      #     aws-region: ${{ env.AWS_REGION }}
-
-
-      # # Install the latest version of Terragrunt CLI and configure the Terragrunt CLI configuration file with a Terragrunt Cloud user API token
-      # - name: Setup Terraform 
-      #   uses: hashicorp/setup-Terraform@v3
-      #   with:
-      #     terraform_version: ${{ env.tf_version }}
-      #     terraform_wrapper: true
-
-      # - name: Setup Terraform version
-      #   run: terraform --version
-
-      # - name: Setup Terraform wrapper path
-      #   run: which terraform
-
-      # - name: Setup Terragrunt
-      #   uses: autero1/action-terragrunt@v3
-      #   with:
-      #     terragrunt-version: ${{ env.TG_VER }}
-      #     token: ${{ env.GH_PAT }}
-
-      # # # Initialize a new or existing Terragrunt working directory by creating initial files, loading any remote state, downloading modules, etc.
-      # # - name: Terragrunt Init
-      # #   run: terragrunt init --terragrunt-non-interactive
-
-      # - name: Terragrunt Plan
-      #   run: |
-      #     cd ${{ env.working_dir }}
-      #     terragrunt run-all plan
-
-
-
-      - name: Plan
-        uses: gruntwork-io/terragrunt-action@v2
-        env:
-          AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
-          TF_PLUGIN_CACHE_DIR: /github/workspace/.terraform.d/plugin-cache
-          # configure git to use custom token to clone repository if it is a private repo.
-          # INPUT_PRE_EXEC_1: |
-          #   git config --global url."https://jazzlyj:${{secrets.GH_PAT}}@github.com".insteadOf "https://github.com"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          tf_version: ${{ env.tf_version }}
-          tg_version: ${{ env.tg_version }}
-          tg_dir: ${{ env.working_dir }}
-          tg_command: 'run-all plan'
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
 
 
-  scan:
-    permissions:
-      contents: read # for actions/checkout to fetch code
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+      # Install the latest version of Terragrunt CLI and configure the Terragrunt CLI configuration file with a Terragrunt Cloud user API token
+      - name: Setup Terraform 
+        uses: hashicorp/setup-Terraform@v3
+        with:
+          terraform_version: ${{ env.tf_version }}
+          terraform_wrapper: true
+
+      - name: Setup Terraform version
+        run: terraform --version
+
+      - name: Setup Terraform wrapper path
+        run: which terraform
+
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt-version: ${{ env.TG_VER }}
+          token: ${{ env.GH_PAT }}
+
+      # # Initialize a new or existing Terragrunt working directory by creating initial files, loading any remote state, downloading modules, etc.
+      # - name: Terragrunt Init
+      #   run: terragrunt init --terragrunt-non-interactive
+
+      - name: Terragrunt Plan
+        run: |
+          cd ${{ env.working_dir }}
+          terragrunt run-all plan
+
+
+
+      # - name: Plan
+      #   uses: gruntwork-io/terragrunt-action@v2
+      #   env:
+      #     AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
+      #     TF_PLUGIN_CACHE_DIR: /github/workspace/.terraform.d/plugin-cache
+      #     # configure git to use custom token to clone repository if it is a private repo.
+      #     # INPUT_PRE_EXEC_1: |
+      #     #   git config --global url."https://jazzlyj:${{secrets.GH_PAT}}@github.com".insteadOf "https://github.com"
+      #   with:
+      #     tf_version: ${{ env.tf_version }}
+      #     tg_version: ${{ env.tg_version }}
+      #     tg_dir: ${{ env.working_dir }}
+      #     tg_command: 'run-all plan'
+
+
+  # scan:
+  #   permissions:
+  #     contents: read # for actions/checkout to fetch code
+  #     security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+  #     actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
       
-    runs-on: ubuntu-latest
-    needs: [ plan ]
+  #   runs-on: ubuntu-latest
+  #   needs: [ plan ]
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Checkov GitHub Action
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          # This will add both a CLI output to the console and create a results.sarif file
-          output_format: cli,sarif
-          output_file_path: console,results.sarif
+  #     - name: Checkov GitHub Action
+  #       uses: bridgecrewio/checkov-action@v12
+  #       with:
+  #         # This will add both a CLI output to the console and create a results.sarif file
+  #         output_format: cli,sarif
+  #         output_file_path: console,results.sarif
         
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
+  #     - name: Upload SARIF file
+  #       uses: github/codeql-action/upload-sarif@v3
         
-        # Results are generated only on a success or failure
-        # this is required since GitHub by default won't run the next step
-        # when the previous one has failed. Security checks that do not pass will 'fail'.
-        # An alternative is to add `continue-on-error: true` to the previous step
-        # Or 'soft_fail: true' to checkov.
-        if: success() || failure()
-        with:
-          sarif_file: results.sarif
+  #       # Results are generated only on a success or failure
+  #       # this is required since GitHub by default won't run the next step
+  #       # when the previous one has failed. Security checks that do not pass will 'fail'.
+  #       # An alternative is to add `continue-on-error: true` to the previous step
+  #       # Or 'soft_fail: true' to checkov.
+  #       if: success() || failure()
+  #       with:
+  #         sarif_file: results.sarif
 
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [ scan ]
-    environment: 'non-prod'
-    # if: github.ref == 'refs/heads/main'
-    steps:
-      - name: 'Checkout'
-        uses: actions/checkout@main
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: [ scan ]
+  #   environment: 'non-prod'
+  #   # if: github.ref == 'refs/heads/main'
+  #   steps:
+  #     - name: 'Checkout'
+  #       uses: actions/checkout@main
 
-      - name: Terraform Plugin Cache
-        uses: actions/cache@v4.0.1
-        with:
-          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-          key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
+  #     - name: Terraform Plugin Cache
+  #       uses: actions/cache@v4.0.1
+  #       with:
+  #         path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+  #         key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
 
-      - name: Deploy
-        uses: gruntwork-io/terragrunt-action@v2
-        env:
-          AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
-          TF_PLUGIN_CACHE_DIR: /github/workspace/.terraform.d/plugin-cache
-        with:
-          tf_version: ${{ env.tf_version }}
-          tg_version: ${{ env.tg_version }}
-          tg_dir: ${{ env.working_dir }}
-          tg_command: 'run-all apply --terragrunt-log-level debug'
+  #     - name: Deploy
+  #       uses: gruntwork-io/terragrunt-action@v2
+  #       env:
+  #         AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
+  #         TF_PLUGIN_CACHE_DIR: /github/workspace/.terraform.d/plugin-cache
+  #       with:
+  #         tf_version: ${{ env.tf_version }}
+  #         tg_version: ${{ env.tg_version }}
+  #         tg_dir: ${{ env.working_dir }}
+  #         tg_command: 'run-all apply --terragrunt-log-level debug'
