@@ -93,7 +93,7 @@ jobs:
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v3
         with:
-          terragrunt_version: ${{ env.tf_version }}
+          terragrunt_version: ${{ env.tg_version }}
           token: ${{ env.GH_PAT }}
 
       # Initialize a new or existing Terragrunt working directory by creating initial files, loading any remote state, downloading modules, etc.
