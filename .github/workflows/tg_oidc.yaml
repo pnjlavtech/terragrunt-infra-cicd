@@ -104,9 +104,9 @@ jobs:
           terragrunt-version: ${{ env.TG_VER }}
           token: ${{ env.GH_PAT }}
 
-      # Initialize a new or existing Terragrunt working directory by creating initial files, loading any remote state, downloading modules, etc.
-      - name: Terragrunt Init
-        run: terragrunt init --terragrunt-non-interactive
+      # # Initialize a new or existing Terragrunt working directory by creating initial files, loading any remote state, downloading modules, etc.
+      # - name: Terragrunt Init
+      #   run: terragrunt init --terragrunt-non-interactive
 
       - name: Terragrunt Plan
         run: 
