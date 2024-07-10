@@ -19,7 +19,7 @@ env:
   tg_version: '0.53.2'
   tf_version: '1.5.7'
   TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
-  working_dir: './non-prod/us-west-2/qa/iam-oidc-gh'
+  working_dir: './non-prod/us-west-2/qa/vpc'
   # IS_GH: “TRUE”  # needed if there are private repos being used
 
 jobs:
