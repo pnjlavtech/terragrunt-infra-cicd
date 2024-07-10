@@ -12,8 +12,8 @@ env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_REGION: 'us-west-2'
   AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-  # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GH_PAT: ${{ secrets.GH_PAT }}
   TG_VER: 0.53.2
   tg_version: '0.53.2'
@@ -23,95 +23,114 @@ env:
   # IS_GH: “TRUE”  # needed if there are private repos being used
 
 jobs:
-
-  tflint:
+  destroy:
     runs-on: ubuntu-latest
+    environment: 'non-prod'
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so follow-up steps can access it
-    - name: Checkout source code
-      uses: actions/checkout@v4
-
-    - name: Create Terraform Plugin Cache Dir
-      run: mkdir -p $TF_PLUGIN_CACHE_DIR
-
-    - name: Terraform Plugin Cache
-      uses: actions/cache@v4.0.1
-      with:
-        path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-        key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
-
-    - name: Setup TFLint
-      uses: terraform-linters/setup-tflint@v4
-      with:
-        tflint_version: v0.50.3
-
-    - name: Show version
-      run: tflint --version
-
-    - name: Init TFLint
-      run: tflint --init
-      env:
-      #   # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
-        GITHUB_TOKEN: ${{ env.GH_PAT }}
-
-    - name: Run TFLint
-      run: tflint -f json 
-
-  plan:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write # This is required for requesting the JWT 
-      contents: read # This is required for actions/checkout
-    needs: [ tflint ]
-
-    defaults:
-      run:
-        shell: bash
-
-    steps:
-      - name: Checkout
+      - name: 'Checkout'
         uses: actions/checkout@main
 
-      - name: Terraform Plugin Cache
-        uses: actions/cache@v4.0.1
+      - name: Destroy
+        uses: gruntwork-io/terragrunt-action@v2
+        env:
+          AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }} 
         with:
-          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-          key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
-          aws-region: ${{ env.AWS_REGION }}
+          tf_version: ${{ env.tf_version }}
+          tg_version: ${{ env.tg_version }}
+          tg_dir: ${{ env.working_dir }}
+          tg_command: 'destroy'
 
 
-      # Install the latest version of Terragrunt CLI and configure the Terragrunt CLI configuration file with a Terragrunt Cloud user API token
-      - name: Setup Terraform 
-        uses: hashicorp/setup-Terraform@v3
-        with:
-          terraform_version: ${{ env.tf_version }}
-          terraform_wrapper: true
+# jobs:
 
-      - name: Setup Terraform version
-        run: terraform --version
+#   tflint:
+#     runs-on: ubuntu-latest
+#     steps:
+#     # Checks-out your repository under $GITHUB_WORKSPACE, so follow-up steps can access it
+#     - name: Checkout source code
+#       uses: actions/checkout@v4
 
-      - name: Setup Terraform wrapper path
-        run: which terraform
+#     - name: Create Terraform Plugin Cache Dir
+#       run: mkdir -p $TF_PLUGIN_CACHE_DIR
 
-      - name: Setup Terragrunt
-        uses: autero1/action-terragrunt@v3
-        with:
-          terragrunt-version: ${{ env.TG_VER }}
-          token: ${{ env.GH_PAT }}
+#     - name: Terraform Plugin Cache
+#       uses: actions/cache@v4.0.1
+#       with:
+#         path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+#         key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
 
-      # # Initialize a new or existing Terragrunt working directory by creating initial files, loading any remote state, downloading modules, etc.
-      # - name: Terragrunt Init
-      #   run: terragrunt init --terragrunt-non-interactive
+#     - name: Setup TFLint
+#       uses: terraform-linters/setup-tflint@v4
+#       with:
+#         tflint_version: v0.50.3
 
-      - name: Terragrunt Plan
-        run: |
-          cd ${{ env.working_dir }}
-          terragrunt run-all plan
+#     - name: Show version
+#       run: tflint --version
+
+#     - name: Init TFLint
+#       run: tflint --init
+#       env:
+#       #   # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+#         GITHUB_TOKEN: ${{ env.GH_PAT }}
+
+#     - name: Run TFLint
+#       run: tflint -f json 
+
+#   plan:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       id-token: write # This is required for requesting the JWT 
+#       contents: read # This is required for actions/checkout
+#     needs: [ tflint ]
+
+#     defaults:
+#       run:
+#         shell: bash
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@main
+
+#       - name: Terraform Plugin Cache
+#         uses: actions/cache@v4.0.1
+#         with:
+#           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+#           key: ${{ runner.os }}-terraform-plugin-cache-${{ hashFiles('**/.terraform.lock.hcl') }}
+
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+#           aws-region: ${{ env.AWS_REGION }}
+
+
+#       # Install the latest version of Terragrunt CLI and configure the Terragrunt CLI configuration file with a Terragrunt Cloud user API token
+#       - name: Setup Terraform 
+#         uses: hashicorp/setup-Terraform@v3
+#         with:
+#           terraform_version: ${{ env.tf_version }}
+#           terraform_wrapper: true
+
+#       - name: Setup Terraform version
+#         run: terraform --version
+
+#       - name: Setup Terraform wrapper path
+#         run: which terraform
+
+#       - name: Setup Terragrunt
+#         uses: autero1/action-terragrunt@v3
+#         with:
+#           terragrunt-version: ${{ env.TG_VER }}
+#           token: ${{ env.GH_PAT }}
+
+#       # # Initialize a new or existing Terragrunt working directory by creating initial files, loading any remote state, downloading modules, etc.
+#       # - name: Terragrunt Init
+#       #   run: terragrunt init --terragrunt-non-interactive
+
+#       - name: Terragrunt Plan
+#         run: |
+#           cd ${{ env.working_dir }}
+#           terragrunt run-all plan
 
 
 
